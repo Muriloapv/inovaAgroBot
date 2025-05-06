@@ -3,6 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const bot = require('./config/bot');
 const { converterPreco } = require('./utils/priceUtils');
 const { adicionarProduto, adicionarMultiplosProdutos, listarProdutos, calcularTotalMultiplos } = require('./services/productService');
+const { adicionarVenda, listarVendasDoDia, calcularTotalVendas } = require('./services/saleService');
 const { mensagemBoasVindas } = require('./messages/welcomeMessage');
 
 // Variável para armazenar produtos temporariamente durante o cálculo
@@ -10,6 +11,8 @@ let produtosParaCalcular = [];
 let calculando = false;
 let cadastrandoMultiplos = false;
 let produtosParaCadastrar = [];
+let aguardandoConfirmacaoVenda = false;
+let ultimoCalculo = null;
 
 // Função para enviar mensagem de boas-vindas
 function enviarMensagemBoasVindas(chatId) {
@@ -47,6 +50,51 @@ bot.on('message', (msg) => {
         if (texto === '/clear') {
             limparConversa(chatId);
             return;
+        }
+
+        // Verifica se está aguardando confirmação de venda
+        if (aguardandoConfirmacaoVenda) {
+            if (texto.toLowerCase() === 'sim' || texto.toLowerCase() === 's') {
+                if (ultimoCalculo) {
+                    const venda = adicionarVenda(ultimoCalculo.total, ultimoCalculo.detalhes);
+                    bot.sendMessage(chatId, `✅ Venda registrada com sucesso!\n\n${ultimoCalculo.detalhes}\n\nTotal: R$ ${ultimoCalculo.total.toFixed(2).replace('.', ',')}`);
+                }
+            } else {
+                bot.sendMessage(chatId, '❌ Venda não registrada.');
+            }
+            aguardandoConfirmacaoVenda = false;
+            ultimoCalculo = null;
+            return;
+        }
+
+        // Verifica se está no modo de cálculo
+        if (calculando) {
+            if (texto.toLowerCase() === 'pronto') {
+                if (produtosParaCalcular.length > 0) {
+                    const resultado = calcularTotalMultiplos(produtosParaCalcular);
+                    ultimoCalculo = {
+                        total: calcularTotalVendas(),
+                        detalhes: resultado
+                    };
+                    bot.sendMessage(chatId, resultado);
+                    bot.sendMessage(chatId, '💾 Deseja salvar esta venda? (Responda com "sim" ou "não")');
+                    aguardandoConfirmacaoVenda = true;
+                } else {
+                    bot.sendMessage(chatId, '❌ Nenhum produto foi adicionado para cálculo!');
+                }
+                calculando = false;
+                produtosParaCalcular = [];
+                return;
+            } else {
+                const partes = texto.split(' ');
+                if (partes.length === 2 && !isNaN(parseInt(partes[1]))) {
+                    produtosParaCalcular.push(texto);
+                    bot.sendMessage(chatId, `✅ Produto adicionado: ${texto}\nContinue digitando ou envie "pronto" para calcular.`);
+                } else {
+                    bot.sendMessage(chatId, '❌ Formato incorreto! Use: [nome] [quantidade]');
+                }
+                return;
+            }
         }
 
         // Envia mensagem de boas-vindas para qualquer mensagem que não seja um comando
@@ -88,10 +136,11 @@ bot.on('message', (msg) => {
                         bot.sendMessage(chatId, '❌ Formato incorreto! Use: [nome] [preço]');
                     }
                 }
+                return;
             } else {
                 enviarMensagemBoasVindas(chatId);
+                return;
             }
-            return;
         }
 
         if (texto.startsWith('#verduras')) {
@@ -123,25 +172,10 @@ bot.on('message', (msg) => {
             produtosParaCalcular = [];
             bot.sendMessage(chatId, '📝 Digite os produtos e quantidades (um por linha):\nExemplo:\nalface 2\ncenoura 3\n\nEnvie "pronto" quando terminar.');
         }
-        else if (calculando) {
-            if (texto.toLowerCase() === 'pronto') {
-                if (produtosParaCalcular.length > 0) {
-                    const resultado = calcularTotalMultiplos(produtosParaCalcular);
-                    bot.sendMessage(chatId, resultado);
-                } else {
-                    bot.sendMessage(chatId, '❌ Nenhum produto foi adicionado para cálculo!');
-                }
-                calculando = false;
-                produtosParaCalcular = [];
-            } else {
-                const partes = texto.split(' ');
-                if (partes.length === 2 && !isNaN(parseInt(partes[1]))) {
-                    produtosParaCalcular.push(texto);
-                    bot.sendMessage(chatId, `✅ Produto adicionado: ${texto}\nContinue digitando ou envie "pronto" para calcular.`);
-                } else {
-                    bot.sendMessage(chatId, '❌ Formato incorreto! Use: [nome] [quantidade]');
-                }
-            }
+        else if (texto === '#vendas') {
+            const extrato = listarVendasDoDia();
+            const totalGeral = calcularTotalVendas();
+            bot.sendMessage(chatId, `${extrato}\n\n📊 Total Geral de Vendas: R$ ${totalGeral.toFixed(2).replace('.', ',')}`);
         }
     } catch (error) {
         console.error('Erro ao processar mensagem:', error);
