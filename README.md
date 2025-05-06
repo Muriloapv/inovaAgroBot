@@ -11,99 +11,75 @@ Este é um bot do Telegram desenvolvido para ajudar pequenos produtores rurais a
 - Extrato diário de vendas
 - Total geral de vendas
 
-## Como usar
+## Passo a Passo para Configuração
 
-1. Primeiro, você precisa criar um bot no Telegram através do [@BotFather](https://t.me/botfather)
-2. Copie o token fornecido pelo BotFather
-3. Crie um arquivo `.env` na raiz do projeto e adicione:
-   ```
-   BOT_TOKEN=seu_token_aqui
-   ```
-4. Instale as dependências:
-   ```bash
-   npm install
-   ```
-5. Inicie o bot:
-   ```bash
-   npm start
-   ```
+### Passo 1: Criar o Bot no Telegram
+1. Acesse o [@BotFather](https://t.me/botfather) no Telegram
+2. Envie o comando '/newbot'
+3. Digite um nome para seu bot
+4. Digite um username para seu bot (deve terminar em 'bot')
+5. Guarde o token que o BotFather fornecer
 
-## Comandos disponíveis
+### Passo 2: Configurar o Projeto
+1. Clone este repositório
+2. Crie um arquivo '.env' na raiz do projeto
+3. Adicione seu token no arquivo '.env':
+   - BOT_TOKEN=seu_token_aqui
 
-### Cadastro de Produtos
-- `#verduras [nome] [preço]` - Cadastra um único produto
-  Exemplo: `#verduras alface 10,50`
-- `#verduras` - Inicia o modo de cadastro múltiplo
-  ```
-  alface 10,50
-  cenoura 5,75
-  pronto
-  ```
+### Passo 3: Instalar Dependências
+1. Abra o terminal na pasta do projeto
+2. Execute o comando:
+   - npm install
 
-### Listagem de Produtos
-- `#produtos` - Lista todos os produtos cadastrados com seus preços
+### Passo 4: Iniciar o Bot
+1. No terminal, execute:
+   - npm start
+2. O bot estará online e pronto para uso
 
-### Cálculo e Vendas
-- `#calcular` - Inicia o modo de cálculo
-  ```
-  alface 2
-  cenoura 3
-  pronto
-  ```
-  Após o cálculo, o bot perguntará se deseja salvar a venda
-  Responda "sim" para salvar ou "não" para descartar
+## Como Usar o Bot
 
-### Extrato de Vendas
-- `#vendas` - Mostra o extrato de vendas do dia com:
-  - Hora de cada venda
-  - Valor de cada venda
-  - Total do dia
-  - Total geral de vendas
+### Passo 1: Cadastrar Produtos
+Opção 1 - Cadastro Único:
+- #verduras alface 10,50
 
-### Outros Comandos
-- `/start` - Inicia o bot e mostra as instruções
-- `/clear` - Limpa a conversa e reinicia o bot
+Opção 2 - Cadastro Múltiplo:
+- #verduras
+- alface 10,50
+- cenoura 5,75
+- pronto
 
-## Observações
+### Passo 2: Verificar Produtos
+- #produtos
+- Mostra lista de todos os produtos cadastrados
+- Exibe nome e preço de cada produto
 
-- O bot armazena os dados em memória, então os produtos e vendas serão perdidos se o bot for reiniciado
-- Os preços podem ser informados com vírgula ou ponto (ex: 10,50 ou 10.50)
-- Os nomes dos produtos são convertidos para minúsculas para evitar duplicatas
-- O extrato de vendas mostra apenas as vendas do dia atual
-- O total geral mostra todas as vendas desde o início da execução do bot
+### Passo 3: Realizar uma Venda
+1. Inicie o cálculo:
+   - #calcular
+2. Digite os produtos e quantidades:
+   - alface 2
+   - cenoura 3
+3. Digite 'pronto' para ver o total
+4. Responda 'sim' para salvar a venda
 
-## Exemplo de Uso
+### Passo 4: Consultar Vendas
+- #vendas
+- Mostra vendas do dia
+- Exibe hora, valor e detalhes
+- Apresenta total do dia e geral
 
-1. Cadastrar produtos:
-   ```
-   #verduras alface 10,50
-   #verduras cenoura 5,75
-   ```
+## Comandos Disponíveis
 
-2. Ver produtos cadastrados:
-   ```
-   #produtos
-   ```
+### Comandos Principais
+- '/start' - Inicia o bot
+- '/clear' - Limpa a conversa
+- '#verduras' - Cadastra produtos
+- '#produtos' - Lista produtos
+- '#calcular' - Calcula vendas
+- '#vendas' - Mostra extrato
 
-3. Calcular uma venda:
-   ```
-   #calcular
-   alface 2
-   cenoura 3
-   pronto
-   ```
+## Exemplo de Extrato
 
-4. Salvar a venda:
-   - Responda "sim" quando o bot perguntar
-
-5. Ver extrato de vendas:
-   ```
-   #vendas
-   ```
-
-## Formato do Extrato
-
-```
 📊 Extrato de Vendas do Dia
 
 🕒 14:30:25
@@ -117,22 +93,21 @@ Este é um bot do Telegram desenvolvido para ajudar pequenos produtores rurais a
 📈 Total do Dia: R$ 44,25
 
 📊 Total Geral de Vendas: R$ 44,25
-```
 
-Em portugues, me diga como posso construir a seguinte aplicação
+## Observações Importantes
 
-Ola, quero desenvolver uma aplicação voltada para o pequeno produtor rural.
+1. Armazenamento
+   - Dados são salvos em memória
+   - Produtos e vendas são perdidos ao reiniciar o bot
 
-Essa aplicação deve ser um bot de telegran, ela deve ser capaz de receber mensagens e armazenar em memoria e separadamente por categorias
+2. Formato de Preços
+   - Use vírgula ou ponto (10,50 ou 10.50)
+   - Números decimais são aceitos
 
-#verduras - categoria aonde contera o nome e o valor unitari
+3. Nomes de Produtos
+   - São convertidos para minúsculos
+   - Evita duplicatas
 
-exemplo: #verduras: alface R$10 
-
-#produtos - apareça todos os produtos cadastrados e seus vlaores
-
-#calcular - o usuario ira mandar o nome do produto e quantidade, o bot deve retornar um calculo bem claro, de quanto ficou a conta
-
-O bot deve ser algo bem intuitivo, aonde seja simples compreenxao, pois sera para pessoas com pouco conhecimento
-
-quero utilizar nodejs como base
+4. Extrato de Vendas
+   - Mostra apenas vendas do dia atual
+   - Total geral inclui todas as vendas
